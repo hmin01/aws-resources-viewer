@@ -1,15 +1,18 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
+import Main from './components/Main';
 import reportWebVitals from './reportWebVitals';
+// Style
+// import 'antd/dist/antd.css';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
   <React.StrictMode>
-    <App />
+    <Suspense fallback={<></>}>
+      <Main />
+    </Suspense>
   </React.StrictMode>
 );
 
