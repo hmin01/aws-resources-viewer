@@ -145,7 +145,6 @@ const CloudFront: React.FC<any> = ({ resource }): JSX.Element => {
 }
 /** [Internal Component] Cognito */
 const Cognito: React.FC<any> = ({ resource }): JSX.Element => {
-  console.log(resource)
   return (
     <StyledResourceItem>
       <div className='icon'>
@@ -468,7 +467,6 @@ const ELB: React.FC<any> = ({ resource }): JSX.Element => {
 }
 /** [Internal Component] Event Bridge */
 const EventBridge: React.FC<any> = ({ resource }): JSX.Element => {
-  console.log(resource)
   return (
     <StyledResourceItem>
       <div className='icon'>

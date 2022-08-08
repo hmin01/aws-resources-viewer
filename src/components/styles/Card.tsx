@@ -59,3 +59,50 @@ export const StyledECSClusterCard = styled.div`
     padding: 12px 18px;
   }
 `;
+/** [Styled Component] 서비스 카드 */
+export const StyledServiceCard = styled.div`
+  background-color: #ffffff;
+  border: 1px solid #d9d9d9;
+  cursor: pointer;
+  display: flex;
+  height: 100%;
+  padding: 12px 14px 12px 16px;
+  position: relative;
+  transition: all 0.33s;
+  &:hover {
+    background-color: #fafafa;
+    transform: scale(1.04);
+  }
+  .icon {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    margin-right: 16px;
+  }
+  .content {
+    flex: 1;
+    .title {
+      font-size: 15px;
+      font-weight: 600;
+      line-height: 20px;
+      margin-bottom: 1px;
+    }
+    .subTitle {
+      color: #bfbfbf;
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 13px;
+      margin-bottom: 0;
+    }
+  }
+  .count {
+    align-items: end;
+    color: #434343;
+    display: flex;
+    justify-content: flex-end;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 24px;
+    margin-left: 12px;
+  }
+`;
