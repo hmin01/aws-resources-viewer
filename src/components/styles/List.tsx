@@ -8,14 +8,16 @@ export const StyledList = styled.ul`
   user-select: 0;
   li {
     background-color: #ffffff;
-    border: 1px solid #d9d9d9;
+    border: 1px solid #f0f0f0;
     border-radius: 8px;
+    box-shadow: 0 0 1px 0 rgba(0, 0, 4, 0.1);
     cursor: pointer;
     margin-bottom: 16px;
     padding: 12px 18px;
     transition: all 0.34s;
     &:hover {
       background-color: #fafafa;
+      box-shadow: 1px 1px 3px 0 rgba(0, 0, 4, 0.3);
       transform: scale(1.016);
     }
     &:last-child {
@@ -55,6 +57,10 @@ export const StyledListItemLabel = styled.div`
     line-height: 20px;
     margin-left: 8px;
   }
+`;
+/** [Styled Component] 빈 아이템  */
+export const StyledItemEmpty = styled.div`
+  padding: 0 10px;
 `;
 /** [Styled Component] 목록 아이템 Extra */
 export const StyledListItemExtra = styled.div`

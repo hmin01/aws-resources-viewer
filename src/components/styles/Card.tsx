@@ -62,7 +62,8 @@ export const StyledECSClusterCard = styled.div`
 /** [Styled Component] 서비스 카드 */
 export const StyledServiceCard = styled.div`
   background-color: #ffffff;
-  border: 1px solid #d9d9d9;
+  border: 1px solid #f0f0f0;
+  box-shadow: 0 0 1px 0 rgba(0, 0, 4, 0.1);
   cursor: pointer;
   display: flex;
   height: 100%;
@@ -71,6 +72,7 @@ export const StyledServiceCard = styled.div`
   transition: all 0.33s;
   &:hover {
     background-color: #fafafa;
+    box-shadow: 1px 1px 3px 0 rgba(0, 0, 4, 0.3);
     transform: scale(1.04);
   }
   .icon {

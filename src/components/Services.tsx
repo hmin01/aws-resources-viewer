@@ -7,6 +7,7 @@ import { useCallback } from 'react';
 import { StyledServiceCard } from './styles/Card';
 // Icon
 import { IconApiGateway, IconCloudFront, IconCognito, IconDynamoDB, IconEBS, IconEC2, IconECR, IconECS, IconEFS, IconElasticache, IconElasticBeanstalk, IconELB, IconEventBridge, IconLambda, IconQLDB, IconRDS, IconS3, IconSES, IconSNS, IconSQS } from './ServiceIcons';
+import { StyledItemEmpty } from './styles/List';
 
 /** [Component] 리전별 서비스 페이지 */
 const Services: React.FC<any> = ({ data, onClearForRegion, onSelectToService, region, regionDF, serviceDF, usage }): JSX.Element => {
@@ -52,7 +53,7 @@ const ServiceList: React.FC<any> = ({ onSelect, resources, serviceDF, usage }): 
       ) : (<></>)} */}
       {serviceDF ? (
         <Row gutter={[16, 16]}>
-          {usage ? items : (<div className='empty'>해당 리전에서 이용 중인 서비스가 없습니다.</div>)}
+          {usage ? items : (<StyledItemEmpty>해당 리전에서 이용 중인 서비스가 없습니다.</StyledItemEmpty>)}
         </Row>
       ) : (<></>)}
     </>
