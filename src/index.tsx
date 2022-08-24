@@ -1,18 +1,31 @@
 import React, { Suspense } from 'react';
 import ReactDOM from 'react-dom/client';
 import Main from './components/Main';
+
 import reportWebVitals from './reportWebVitals';
 // Style
+import { createGlobalStyle } from 'styled-components';
+import { RecoilRoot } from 'recoil';
 // import 'antd/dist/antd.css';
+const GlobalStyle = createGlobalStyle`
+  body {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+`;
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
   <React.StrictMode>
-    <Suspense fallback={<></>}>
-      <Main />
-    </Suspense>
+    <RecoilRoot>
+      <Suspense fallback={<></>}>
+        <GlobalStyle />
+        <Main />
+      </Suspense>
+    </RecoilRoot>
   </React.StrictMode>
 );
 
