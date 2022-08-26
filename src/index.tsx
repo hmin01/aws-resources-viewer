@@ -1,12 +1,11 @@
 import React, { Suspense } from 'react';
 import ReactDOM from 'react-dom/client';
 import Main from './components/Main';
-
+import { RecoilRoot } from 'recoil';
 import reportWebVitals from './reportWebVitals';
 // Style
 import { createGlobalStyle } from 'styled-components';
-import { RecoilRoot } from 'recoil';
-// import 'antd/dist/antd.css';
+// Style
 const GlobalStyle = createGlobalStyle`
   body {
     box-sizing: border-box;

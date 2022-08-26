@@ -5,10 +5,10 @@ const roleAtom = atom<string | undefined>({
   key: 'roleAtom',
   default: undefined
 });
-/** [Atom] 페이지 전환 상태 변수 */
-const transformAtom = atom<boolean>({
-  key: 'transformAtom',
-  default: false
+/** [Atom] 스캔 결과 파일 이름 */
+const scanFileAtom = atom<string | undefined>({
+  key: 'scanFileAtom',
+  default: undefined
 });
 
 /** [Selector] Role arn 읽기/쓰기를 위한 순수 함수 */
@@ -17,9 +17,9 @@ export const roleSelector = selector<string | undefined>({
   get: ({ get }) => get(roleAtom),
   set: ({ set }, value) => set(roleAtom, value)
 });
-/** [Selector] 페이지 변환을 위한 순수 함수 */
-export const transformSelector = selector<boolean>({
-  key: 'transformSelector',
-  get: ({ get }) => get(transformAtom),
-  set: ({ set }, value) => set(transformAtom, value)
+/** [Selector] 스캔 파일을 위한 순수 함수 */
+export const scanFileSelector = selector<string | undefined>({
+  key: 'scanFileSelector',
+  get: ({ get }) => get(scanFileAtom),
+  set: ({ set }, value) => set(scanFileAtom, value)
 });

@@ -8,9 +8,14 @@ const Services = lazy(() => import('./Services'));
 // Data
 import regionDF from '../static/regions';
 import serviceDF from '../static/services';
+import { useRecoilValue, useRecoilValueLoadable } from 'recoil';
+// State
+import { scanFileSelector } from '../models/state';
 
 /** [Component] 메인 컴포넌트 */
 const Viewer: React.FC<any> = (): JSX.Element => {
+  // 스캔 파일명
+  const { contents, state } = useRecoilValueLoadable(scanFileSelector);
   // 스캔 데이터
   const [data, setData] = useState<any>({});
   // 선택된 리전
@@ -22,8 +27,19 @@ const Viewer: React.FC<any> = (): JSX.Element => {
 
   // 스캔 데이터 불러오기
   useEffect(() => {
-    fetch('output.json').then((res: any) => res.json()).then((data: any) => setData(data));
-  }, []);
+    if (contents && state === 'hasValue') {
+      fetch(`${import.meta.env.VITE_API_SERVER}/scan/${contents}`).then((res: any) => {
+        if (res.status < 400) return res.json();
+        else return {};
+      }).then((data: any) => {
+        if ('message' in data) {
+          setData(JSON.parse(data.message));
+        } else {
+          console.error('[ERROR] Failed to fetch');
+        }
+      });
+    }
+  }, [contents, state]);
 
   /** [Event handler] 리전 선택 초기화 */
   const onClearForRegion = useCallback(() => { setRegion(''); setService('') }, []);

@@ -4,14 +4,14 @@ import { useRecoilValue } from 'recoil';
 import Pretreatment from './Pretreatment';
 import Viewer from './Viewer';
 // State
-import { transformSelector } from '../models/state';
+import { scanFileSelector } from '../models/state';
 
 const Main: React.FC<any> = (): JSX.Element => {
-  const transform: boolean = useRecoilValue(transformSelector);
+  const scanFile: string | undefined = useRecoilValue(scanFileSelector);
   // 컴포넌트 반환
   return (
     <>
-      {transform ? (<Viewer />) : (<Pretreatment />)}
+      {scanFile && scanFile !== '' ? (<Viewer />) : (<Pretreatment />)}
     </>
   );
 }
