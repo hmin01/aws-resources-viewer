@@ -5,7 +5,7 @@ export const StyledContainer = styled.div`
   margin-left: auto;
   margin-right: auto;
   position: relative;
-  width: 1048px;
+  width: 768px;
 `;
 /** [Styled Component] 컨테이너 여백 */
 export const StyledContainerMargin = styled.div`

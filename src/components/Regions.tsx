@@ -1,13 +1,20 @@
-import React, { useMemo } from 'react';
+import React from 'react';
+import { useCallback, useMemo } from 'react';
+import { useSetRecoilState } from 'recoil';
 // Component
-import { Col, Divider, Row, Tag } from 'antd';
+import { Col, Divider, Modal, Row, Tag } from 'antd';
 import { Card, PageHeader } from './Layout';
 import { StyledContainerMargin } from './styles/Layout';
 import { StyledList, StyledListItem, StyledListItemLabel } from './styles/List';
-import { useCallback } from 'react';
+// State
+import { roleSelector, scanFileSelector } from '../models/state';
 
 /** [Component] 계정 내 리전 페이지 */
 const Regions: React.FC<any> = ({ data, onSelectToRegion, regionDF }): JSX.Element => {
+  // Role, Scan 파일 상태 함수
+  const setRoleArn = useSetRecoilState(roleSelector);
+  const setScanFile = useSetRecoilState(scanFileSelector);
+
   // 글로벌 서비스 사용 유무
   const useGlobal: boolean = useMemo(() => ("global" in data) && ("usage" in data.global) ? data.global.usage : false, [data]);
   // 리전 목록
@@ -16,11 +23,23 @@ const Regions: React.FC<any> = ({ data, onSelectToRegion, regionDF }): JSX.Eleme
   const inUse: number = useMemo(() => regions.filter((region: any): boolean => region.usage).length, [regions]);
   // 미사용 리전 수
   const notUse: number = useMemo(() => regions.length - inUse, [regions, inUse]);
+
+  /** [Event handler] 초기화 */
+  const onClear = useCallback(() => {
+    setRoleArn(undefined);
+    setScanFile(undefined);
+  }, []);
+  /** [Event handler] 팝업 열기 */
+  const onOpen = useCallback(() => Modal.confirm({
+    title: '스캔 결과 초기화',
+    content: '스캔 결과에 대한 데이터는 일회성으로써 해당 페이지를 벗어날 경우, 다시 스캔을 시도해야 합니다.',
+    onOk: onClear,
+  }), []);
   
   // 컴포넌트 반환
   return (
     <StyledContainerMargin>
-      <PageHeader title='Regions'>
+      <PageHeader onBack={onOpen} title='Regions'>
         <Row gutter={16}>
           <Col span={6}>
             <Card label='사용 가능한 총 리전' value={regions.length} />

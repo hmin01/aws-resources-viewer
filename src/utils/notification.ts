@@ -1,3 +1,4 @@
+import React from 'react';
 import { notification } from 'antd';
 
 type NotificationType = "error" | "warning" | "success" | "info";
@@ -8,10 +9,10 @@ type NotificationType = "error" | "warning" | "success" | "info";
  * @param title 알림 제목
  * @param message 알림 메시지
  */
-export const createNotification = (type: NotificationType, title: string, message?: string): void => {
+export const createNotification = (type: NotificationType, title: string, message?: React.ReactNode): void => {
   notification[type]({
     message: title,
     description: message,
-    duration: 1.3
+    duration: 1.4
   });
 }

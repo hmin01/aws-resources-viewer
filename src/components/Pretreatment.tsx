@@ -1,235 +1,107 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { useRecoilState } from 'recoil';
-import styled from 'styled-components';
+import React, { useEffect } from 'react';
+import { useCallback, useState } from 'react';
+import { useSetRecoilState } from 'recoil';
 // Component
-import { motion } from 'framer-motion';
-import { StyledContainer } from './styles/Layout';
 import { Button, Form, Input, Modal, Spin } from 'antd';
 import { NotionRenderer } from 'react-notion';
+import { StyledBody, StyledButtonForm, StyledModalContent, StyledHeader, StyledQuestion, StyledSection, StyledNotion } from './styles/Pretreatment';
+import { StyledContainer } from './styles/Layout';
 // Icon
-import { IoChevronForward, IoRefreshCircleOutline, IoSearchCircleOutline } from 'react-icons/io5';
+import { IoChevronForward } from 'react-icons/io5';
 // State
-import { roleSelector, scanFileSelector } from '../models/state';
+import { roleSelector } from '../models/state';
 // Style
 import 'react-notion/src/styles.css'
 // Util
 import { createNotification } from '../utils/notification';
 
-const StyledSection = styled.div`
-  align-items: center;
-  display: flex;
-  justify-content: center;
-  height: 100vh;
-  width: 100%;
-`;
-const StyledForm = styled(motion.div)`
-  overflow: hidden;
-  width: 340px;
-  .header {
-    margin-bottom: 32px;
-    text-align: center;
-    .title {
-      color: #434343;
-      font-size: 24px;
-      font-weight: 700;
-      line-height: 1.4;
-      margin-bottom: 8px;
-      margin-top: 0;
-    }
-    .subtitle {
-      color: #8C8C8C;
-      font-size: 15px;
-      font-weight: 400;
-      line-height: 1.2;
-      margin: 0;
-    }
-  }
-  .ant-form-item {
-    margin-bottom: 8px;
-  }
-  .howto {
-    align-items: center;
-    color: #08979c;
-    display: flex;
-    font-size: 13px;
-    font-weight: 600;
-    line-height: 1.4;
-    text-decoration: underline;
-    .icon {
-      align-items: center;
-      display: flex;
-      justify-content: center;
-    }
-    .text {
-      cursor: pointer;
-    }
-  }
-`;
-const StyledButtonForm = styled(motion.div)`
-  display: flex;
-  justify-content: center;
-`;
-const StyledButton = styled(motion.button)`
-  align-items: center;
-  background-color: #FFFFFF;
-  border: 1px solid #E7EAEC;
-  border-radius: 6px;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  margin-left: 24px;
-  padding: 32px 48px;
-  &:first-child {
-    margin-left: 0;
-  }
-  .icon {
-    align-items: center;
-    display: flex;
-    font-size: 48px;
-    justify-content: center;
-  }
-  .text {
-    font-size: 14px;
-    font-weight: 400;
-    line-height: 1.3;
-    margin-bottom: 0;
-    margin-top: 4px;
-  }
-`;
-const StyledNotion = styled.div`
-  .empty {
-    padding: 32px;
-  }
-  .notion-code {
-    font-size: 14px;
-    padding: 16px 20px;
-  }
-  .notion-h3 {
-    font-size: 18px;
-  }
-  .notion-h3:first-child {
-    margin-top: 0;
-  }
-  .notion-text {
-    font-size: 14px;
-  }
-`;
-
 const Pretreatment: React.FC<any> = (): JSX.Element => {
-  const [role, setRole] = useRecoilState(roleSelector);
-  const [scanFile, setScanFile] = useRecoilState(scanFileSelector);
-
+  // 팝업 표시 상태 (Notion 팝업)
+  const [visibleH, setVisibleH] = useState<boolean>(false);
+  // 팝업 표시 상태 (Input 팝업)
+  const [visibleI, setVisibleI] = useState<boolean>(false);
+  // Notion 불러오기 상태
   const [notion, setNotion] = useState<any>(undefined);
-  const [spinning, setSpinning] = useState<boolean>(false);
-  const [step, setStep] = useState<number>(1);
-  const [validate, setValidate] = useState<any>(undefined);
-  const [visible, setVisible] = useState<boolean>(false);
+  // Role 설정 함수
+  const setRole = useSetRecoilState(roleSelector);
+  // Form 객체
+  const [form] = Form.useForm();
 
-  /** [Event handler] 팝업 닫기 */
-  const onClose = useCallback(() => setVisible(false), []);
-  /** [Event handler] Input 데이터 변경 */
-  const onChange = useCallback((e: any) => !checkBlank(e.target.value) ? setValidate(undefined): undefined, []);
-  /** [Event handler] 팝업 열기 */
-  const onOpen = useCallback(() => setVisible(true), []);
-  /** [Event handler] Role 재설정 */
-  const onReset = useCallback(() => setStep(1), []);
-  /** [Event handler] 리소스 스캔 */
-  const onScan = useCallback(async () => {
-    // 스캔 파일명 생성
-    const key: string = new Date().getTime().toString();
-    // Set spinning
-    setSpinning(true);
-    // 스캔 API 호출
-    const response = await fetch(`${import.meta.env.VITE_API_SERVER}/scan`, {
-      body: JSON.stringify({ key: `${key}.json`, role }),
-      headers: { 'Content-Type': 'application/json' },
-      method: 'POST'
-    });
-    // Process
-    if (response.status >= 400) {
-      createNotification('error', 'Failed scan', (await response.json()).message);
-      setScanFile('');
-    } else {
-      setScanFile(key);
-    }
-    // setScanFile('1661413112011');
-  }, [role]);
-  /** [Event handler] Role ARN 설정 */
-  const onSetting = useCallback((value: string) => {
-    if (!checkPattern(value)) {
-      // Setting
-      setValidate('error');
-      // Notification
-      createNotification('error', 'Invalid ARN', 'The role arn format is not valid. Please check it again and enter it.');
-    } else {
-      // Setting
-      setRole(value);
-      setValidate('success');
-      // Notification
-      createNotification('success', 'Successful', 'Setup completed with the entered arn.');
-      // Set step
-      setStep(2);
-    }
+  /** [Event handler] 팝업 닫기 (Input 팝업) */
+  const onCancelI = useCallback(() => {
+    // 팝업 표시 상태 (false)
+    setVisibleI(false);
+    // Form 초기화
+    form.resetFields();
   }, []);
-  // 스캔 완료 후, spinning 종료
-  useEffect(() => scanFile ? setSpinning(false) : undefined, [scanFile]);
+  /** [Event handler] 팝업 닫기 (Notion 팝업) */
+  const onCancelH = useCallback(() => setVisibleH(false), []);
+  /** [Event handler] 팝업 열기 (Input 팝업) */
+  const onOpenI = useCallback(() => setVisibleI(true), []);
+  /** [Event handler] 팝업 열기 (Notion 팝업) */
+  const onOpenH = useCallback(() => setVisibleH(true), []);
+  /** [Event handler] Role ARN 설정 */
+  const onSetting = useCallback((values: any) => {
+    // Setting
+    setRole(values.role);
+    setVisibleI(false);
+    // Notification
+    createNotification('success', 'Successful', 'Role ARN을 설정하였습니다.');
+  }, []);
 
+  /** [Fetch] Notion 페이지 Invoke */
   useEffect(() => {
-    fetch(`https://notion-api.splitbee.io/v1/page/Set-a-role-for-scan-4fd28d108f0c4bed85acf9de9e1cc07b`).then((res: any) => res.json()).then((data: any) => setNotion(data));
+    fetch(import.meta.env.VITE_NOTION).then((res: any) => res.json()).then((data: any) => setNotion(data));
   }, []);
 
   // 컴포넌트 반환
   return (
     <StyledContainer>
-      <StyledSection>
-        <div>
-          <StyledForm hidden={step > 1}>
-            <div className='header'>
-              <h3 className='title'>Enter a role arn</h3>
-              <p className='subtitle'>This input is not stored separately as a one-time operation.</p>
-            </div>
-            <div className='content'>
-              <Form>
-                <Form.Item hasFeedback validateStatus={validate}>
-                  <Input.Search placeholder='Your iam role arn' enterButton='Setting' onSearch={onSetting} onChange={onChange} />
-                </Form.Item>
-              </Form>
-              <a className='howto' onClick={onOpen}>
-                <span className='icon'>
-                  <IoChevronForward />
-                </span>
-                <label className='text'>How to set a role?</label>
-              </a>
-            </div>
-          </StyledForm>
-          <div hidden={step < 2}>
-            <Spin size='large' tip='Scanning' spinning={spinning}>
-              <StyledButtonForm>
-                <FuncButton icon={<IoRefreshCircleOutline />} onClick={onReset} text='Reset' />
-                <FuncButton icon={<IoSearchCircleOutline />} onClick={onScan} text='Scan' />
-              </StyledButtonForm>
-            </Spin>
-          </div>
-        </div>
-      </StyledSection>
-      <Modal footer={[<Button key='submit' onClick={onClose} type='primary'>OK</Button>]} onCancel={onClose} title='How to set a role' visible={visible} width={768}>
+      <StyledBody>
+        <StyledHeader>
+          <b>A</b>ws <b>R</b>esources <b>S</b>canner
+        </StyledHeader>
+        <StyledSection>
+          <p>AWS 계정 내에서 사용 중인 리소스들을 조회하고,<br/>조회된 결과를 목록화하여 시각화된 데이터를 제공해주는 서비스입니다.</p>
+        </StyledSection>
+        <StyledSection>
+          <h5>Store</h5>
+          <p>조회 결과는 하루(24시간)동안 보존되며, 조회를 다시 진행할 경우에 이전 작업 결과는 즉시 삭제됩니다.</p>
+        </StyledSection>
+        <StyledSection>
+          <h5>Required</h5>
+          <p>계정 내의 리소스들을 조회할 수 있는 권한(정책)을 가진 AWS IAM Role이 필요합니다.</p>
+          <StyledQuestion onClick={onOpenH}>
+            <span className='icon'>
+              <IoChevronForward />
+            </span>
+            <label className='text'>서비스 사용을 위한 Role 설정 방법</label>
+          </StyledQuestion>
+        </StyledSection>
+        <StyledButtonForm>
+          <Button onClick={onOpenI} type='primary'>시작하기</Button>
+        </StyledButtonForm>
+      </StyledBody>
+      <Modal centered footer={[<Button key='submit' onClick={onCancelH} type='primary'>확인</Button>]} onCancel={onCancelH} title='How to set a role' visible={visibleH} width={768}>
         <Spin size='large' spinning={notion === undefined} tip='Loading'>
           <StyledNotion>
             {notion ? (<NotionRenderer blockMap={notion} />) : (<div className='empty'></div>)}
           </StyledNotion>
         </Spin>
       </Modal>
+      <Modal onCancel={onCancelI} footer={false} title='Role ARN 입력' visible={visibleI}>
+        <StyledModalContent>
+          <Form form={form} onFinish={onSetting}>
+            <Input.Group compact>
+              <Form.Item name='role' rules={[{ required: true, message: 'Role ARN을 입력하세요.' }, { pattern: new RegExp('^arn:aws:iam::[0-9]{12}:role\/[a-zA-Z0-9+=,.@-_/]+'), message: 'Role ARN 형식이 올바르지 않습니다.' }]}>
+                <Input placeholder='AWS IAM Role ARN' />
+              </Form.Item>
+              <Button htmlType='submit' type='primary'>설정</Button>
+            </Input.Group>
+          </Form>
+        </StyledModalContent>
+      </Modal>
     </StyledContainer>
-  );
-}
-
-const FuncButton: React.FC<any> = ({ icon, onClick, text }): JSX.Element => {
-  return (
-    <StyledButton onClick={onClick} whileHover={{ scale: 1.06 }} >
-      <span className='icon'>{icon}</span>
-      <p className='text'>{text}</p>
-    </StyledButton>
   );
 }
 
